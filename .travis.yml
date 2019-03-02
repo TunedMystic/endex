@@ -1,0 +1,10 @@
+language: python
+python:
+  - "3.7-dev"
+cache: pip
+install:
+  - pip install -r requirements-dev.txt
+script:
+  - echo 'Fake python tests passed'
+after_success:
+  - codecov
