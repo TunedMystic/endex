@@ -1,5 +1,9 @@
 -r requirements.txt
 
+better-exceptions==0.2.2
 codecov==2.0.15
+Faker==1.0.2
+mongomock==3.15.0
 pytest==4.3.0
 pytest-cov==2.6.1
+pytest-mock==1.10.1
