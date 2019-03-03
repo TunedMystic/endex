@@ -39,12 +39,18 @@ class Address(EmbeddedDocument):
     zipcode = StringField()
     country = StringField(max_length=2, chocies=COUNTRIES_BY_CODE_CHOICES)
 
+    def __str__(self):
+        return f'{self.street}, {self.city}, {self.country}'
+
 
 class Contact(EmbeddedDocument):
     """An embedded document that stores contact info."""
 
     email = EmailField()
     phone = StringField()
+
+    def __str__(self):
+        return f'{self.email}, {self.phone}'
 
 
 # -------------------------------------------------------------------
