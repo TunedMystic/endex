@@ -1,0 +1,22 @@
+[run]
+branch = True
+
+omit =
+    */test*
+    */tmp*
+    */misc*
+    */__init__.py
+    */constants.py
+    endex/db.py
+    endex/settings.py
+
+[report]
+show_missing = True
+precision = 2
+fail_under = 90
+
+[html]
+directory = coverage_html
+
+[xml]
+output = coverage.xml
