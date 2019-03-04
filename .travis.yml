@@ -5,6 +5,6 @@ cache: pip
 install:
   - pip install -r requirements-dev.txt
 script:
-  - echo 'Fake python tests passed'
+  - pytest --cov-report term --cov=./endex endex/tests
 after_success:
   - codecov
