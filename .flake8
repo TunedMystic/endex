@@ -1,0 +1,13 @@
+[flake8]
+max-line-length = 100
+max-complexity = 8
+exclude =
+    .git
+    *conftest.py
+    venv/*
+    tmp/*
+    misc/*
+    *node_modules*
+ignore = 
+    # E731: do not assign a lambda expression, use a def
+    E731

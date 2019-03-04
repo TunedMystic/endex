@@ -16,21 +16,6 @@ from .constants import (
 # ------------------ Embedded Model definitions ---------------------
 
 
-class AssetDetail(EmbeddedDocument):
-    """An embedded document that stores Asset details."""
-
-    # Stock details.
-    shares_float = DecimalField(max_digits=12, decimal_places=0)
-    shares_outstanding = DecimalField(max_digits=12, decimal_places=0)
-    held_by_insiders = DecimalField(max_digits=6, decimal_places=5)
-    held_by_institutions = DecimalField(max_digits=6, decimal_places=5)
-
-    # Etf details.
-    market_index = StringField()
-    leverage = IntField(choices=ETF_LEVERAGE_BY_CODE_CHOICES)
-    total_assets = DecimalField(max_digits=12, decimal_places=0)
-
-
 class Address(EmbeddedDocument):
     """An embedded document that stores address info."""
 
@@ -39,12 +24,18 @@ class Address(EmbeddedDocument):
     zipcode = StringField()
     country = StringField(max_length=2, chocies=COUNTRIES_BY_CODE_CHOICES)
 
+    def __str__(self):
+        return f'{self.street}, {self.city}, {self.country}'
+
 
 class Contact(EmbeddedDocument):
     """An embedded document that stores contact info."""
 
     email = EmailField()
     phone = StringField()
+
+    def __str__(self):
+        return f'{self.email}, {self.phone}'
 
 
 # -------------------------------------------------------------------
@@ -60,21 +51,29 @@ class Asset(Document):
     symbol = StringField(max_length=10, required=True, unique_with=['exchange'])
     name = StringField(required=True)
     exchange = StringField(choices=EXCHANGES_BY_NAME_CHOICES)
-    isin = StringField(max_length=12)
+    market_index = StringField()
     cusip = StringField(max_length=9)
+    isin = StringField(max_length=12)
 
     description = StringField()
     website = URLField()
     date_founded = DateTimeField()
     date_listed = DateTimeField()
 
-    industry = StringField()
     sector = StringField()
+    industry = StringField()
     issuer = StringField()
     category = StringField()
     tags = ListField(StringField())
 
-    detail = EmbeddedDocumentField(AssetDetail)
+    shares_float = DecimalField(max_digits=12, decimal_places=0)
+    shares_outstanding = DecimalField(max_digits=12, decimal_places=0)
+    held_by_institutions = DecimalField(max_digits=6, decimal_places=5)
+    held_by_insiders = DecimalField(max_digits=6, decimal_places=5)
+
+    leverage = IntField(choices=ETF_LEVERAGE_BY_CODE_CHOICES)
+    total_assets = DecimalField(max_digits=12, decimal_places=0)
+
     address = EmbeddedDocumentField(Address)
     contact = EmbeddedDocumentField(Contact)
 
