@@ -11,8 +11,7 @@ from endex.constants import (
     EXCHANGE_NAMES
 )
 from endex.models import (
-    Address, Asset,
-    AssetDetail, Contact
+    Address, Asset, Contact
 )
 
 
@@ -81,18 +80,10 @@ def random_tags():
     return fake.words(nb=random.randint(0, 4))
 
 
-def asset_detail_for_stock():
-    # The list of fields to exclude when generating an AssetDetail for a stock.
-    fields_to_exclude = ['market_index', 'leverage', 'total_assets']
-    return AssetDetailFactory(**{f: None for f in fields_to_exclude})
-
-
-def asset_detail_for_etf():
-    # The list of fields to exclude when generating an AssetDetail for a etf.
-    fields_to_exclude = [
-        'shares_float', 'shares_outstanding',
-        'held_by_insiders', 'held_by_institutions']
-    return AssetDetailFactory(**{f: None for f in fields_to_exclude})
+MARKET_INDEX_BY_TYPE = {
+    'stock': lambda: None,
+    'etf': lambda: random_symbol()
+}
 
 
 SECTOR_BY_TYPE = {
@@ -119,6 +110,42 @@ CATEGORY_BY_TYPE = {
 }
 
 
+SHARES_FLOAT_BY_TYPE = {
+    'stock': lambda: random_big_number(),
+    'etf': lambda: None
+}
+
+
+SHARES_OUTSTANDING_BY_TYPE = {
+    'stock': lambda: random_big_number(),
+    'etf': lambda: None
+}
+
+
+INST_HELD_BY_TYPE = {
+    'stock': lambda: random_big_number(),
+    'etf': lambda: None
+}
+
+
+INSIDER_HELD_BY_TYPE = {
+    'stock': lambda: random_big_number(),
+    'etf': lambda: None
+}
+
+
+LEVERAGE_BY_TYPE = {
+    'stock': lambda: None,
+    'etf': lambda: random_leverage()
+}
+
+
+TOTAL_ASSETS_BY_TYPE = {
+    'stock': lambda: None,
+    'etf': lambda: random_big_number()
+}
+
+
 ADDRESS_BY_TYPE = {
     'stock': lambda: AddressFactory(),
     'etf': lambda: None
@@ -128,12 +155,6 @@ ADDRESS_BY_TYPE = {
 CONTACT_BY_TYPE = {
     'stock': lambda: ContactFactory(),
     'etf': lambda: None
-}
-
-
-ASSET_DETAIL_BY_TYPE = {
-    'stock': lambda: asset_detail_for_stock(),
-    'etf': lambda: asset_detail_for_etf()
 }
 
 
@@ -155,28 +176,17 @@ class ContactFactory(factory.mongoengine.MongoEngineFactory):
     phone = factory.LazyFunction(random_phone)
 
 
-class AssetDetailFactory(factory.mongoengine.MongoEngineFactory):
-    class Meta:
-        model = AssetDetail
-
-    shares_float = factory.LazyFunction(random_big_number)
-    shares_outstanding = factory.LazyFunction(random_big_number)
-    held_by_institutions = factory.LazyFunction(random_percent)
-    held_by_insiders = factory.LazyFunction(random_percent)
-
-    market_index = factory.LazyFunction(random_symbol)
-    leverage = factory.LazyFunction(random_leverage)
-    total_assets = factory.LazyFunction(random_big_number)
-
-
 class AssetFactory(factory.mongoengine.MongoEngineFactory):
     class Meta:
         model = Asset
 
+    asset_hash = factory.Faker('sha1')
+
     type = factory.LazyFunction(lambda: random.choice(ASSETS_BY_TYPE_CHOICES)[0])
-    name = factory.Faker('company')
     symbol = factory.LazyFunction(random_symbol)
+    name = factory.Faker('company')
     exchange = factory.LazyFunction(random_exchange)
+    market_index = factory.LazyAttribute(lambda o: MARKET_INDEX_BY_TYPE[o.type]())
     cusip = factory.LazyFunction(random_cusip)
     isin = factory.LazyAttribute(lambda o: random_isin(o.cusip))
 
@@ -191,6 +201,13 @@ class AssetFactory(factory.mongoengine.MongoEngineFactory):
     category = factory.LazyAttribute(lambda o: CATEGORY_BY_TYPE[o.type]())
     tags = factory.LazyFunction(random_tags)
 
-    detail = factory.LazyAttribute(lambda o: ASSET_DETAIL_BY_TYPE[o.type]())
+    shares_float = factory.LazyAttribute(lambda o: SHARES_FLOAT_BY_TYPE[o.type]())
+    shares_outstanding = factory.LazyAttribute(lambda o: SHARES_OUTSTANDING_BY_TYPE[o.type]())
+    held_by_institutions = factory.LazyAttribute(lambda o: INST_HELD_BY_TYPE[o.type]())
+    held_by_insiders = factory.LazyAttribute(lambda o: INSIDER_HELD_BY_TYPE[o.type]())
+
+    leverage = factory.LazyFunction(random_leverage)
+    total_assets = factory.LazyFunction(random_big_number)
+
     address = factory.LazyAttribute(lambda o: ADDRESS_BY_TYPE[o.type]())
     contact = factory.LazyAttribute(lambda o: CONTACT_BY_TYPE[o.type]())
