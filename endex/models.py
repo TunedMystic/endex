@@ -1,83 +1,102 @@
-from mongoengine import (
-    DateTimeField, DecimalField, Document, EmailField,
-    EmbeddedDocument, EmbeddedDocumentField,
-    IntField, ListField, StringField, URLField,
-)
+from peewee import (Model, CharField, DateField,
+                    DecimalField, ForeignKeyField,
+                    IntegerField, TextField)
 
-from .constants import (
-    ASSETS_BY_TYPE_CHOICES,
-    COUNTRIES_BY_CODE_CHOICES,
-    ETF_LEVERAGE_BY_CODE_CHOICES,
-    EXCHANGES_BY_NAME_CHOICES,
-)
+from .constants import (COUNTRIES_BY_CODE_CHOICES,
+                        ETF_LEVERAGE_BY_CODE_CHOICES,
+                        ETF_LEVERAGE_NONE)
+from .db import get_db
 
 
-# -------------------------------------------------------------------
-# ------------------ Embedded Model definitions ---------------------
+database = get_db()
 
 
-class Address(EmbeddedDocument):
-    """An embedded document that stores address info."""
+class BaseModel(Model):
+    class Meta:
+        database = database
 
-    street = StringField()
-    city = StringField()
-    zipcode = StringField()
-    country = StringField(max_length=2, chocies=COUNTRIES_BY_CODE_CHOICES)
+
+class SimpleModel(BaseModel):
+    name = CharField()
 
     def __str__(self):
-        return f'{self.street}, {self.city}, {self.country}'
+        return self.name
 
 
-class Contact(EmbeddedDocument):
-    """An embedded document that stores contact info."""
-
-    email = EmailField()
-    phone = StringField()
-
-    def __str__(self):
-        return f'{self.email}, {self.phone}'
+class Exchange(SimpleModel):
+    pass
 
 
-# -------------------------------------------------------------------
-# ------------------ Concrete Model definitions ---------------------
+class MarketIndex(SimpleModel):
+    pass
 
 
-class Asset(Document):
-    """The Asset document represents a financial asset."""
+class Category(SimpleModel):
+    pass
 
-    asset_hash = StringField()
 
-    type = StringField(choices=ASSETS_BY_TYPE_CHOICES, required=True)
-    symbol = StringField(max_length=10, required=True, unique_with=['exchange'])
-    name = StringField(required=True)
-    exchange = StringField(choices=EXCHANGES_BY_NAME_CHOICES)
-    market_index = StringField()
-    cusip = StringField(max_length=9)
-    isin = StringField(max_length=12)
+class EtfIssuer(SimpleModel):
+    pass
 
-    description = StringField()
-    website = URLField()
-    date_founded = DateTimeField()
-    date_listed = DateTimeField()
 
-    sector = StringField()
-    industry = StringField()
-    issuer = StringField()
-    category = StringField()
-    tags = ListField(StringField())
+class Sector(SimpleModel):
+    pass
 
-    shares_float = DecimalField(max_digits=12, decimal_places=0)
-    shares_outstanding = DecimalField(max_digits=12, decimal_places=0)
-    held_by_institutions = DecimalField(max_digits=6, decimal_places=5)
-    held_by_insiders = DecimalField(max_digits=6, decimal_places=5)
 
-    leverage = IntField(choices=ETF_LEVERAGE_BY_CODE_CHOICES)
-    total_assets = DecimalField(max_digits=12, decimal_places=0)
+class Industry(SimpleModel):
+    pass
 
-    address = EmbeddedDocumentField(Address)
-    contact = EmbeddedDocumentField(Contact)
 
-    meta = {'collection': 'assets'}
+class AssetBase(SimpleModel):
+    """
+    Base class for a financial Asset.
+    """
+
+    # asset_hash = CharField(max_length=40)
+
+    symbol = CharField(max_length=10)
+    exchange = ForeignKeyField(Exchange, null=True)
+    description = TextField(null=True)
+    date_founded = DateField(null=True)
+    date_listed = DateField(null=True)
+    website = DateField(null=True)
+    email = CharField(null=True)
+    phone = CharField(null=True)
 
     def __str__(self):
-        return f'{self.symbol} | {self.type}'
+        return self.symbol
+
+
+class IdentifierMixin(BaseModel):
+    cusip = CharField(max_length=9, null=True)
+    isin = CharField(max_length=12, null=True)
+
+
+class AddressMixin(BaseModel):
+    street = CharField(null=True)
+    city = CharField(null=True)
+    zipcode = CharField(null=True)
+    country = CharField(max_length=2, choices=COUNTRIES_BY_CODE_CHOICES, null=True)
+
+
+class Stock(AssetBase, IdentifierMixin, AddressMixin):
+    sector = ForeignKeyField(Sector, backref='stocks', null=True)
+    industry = ForeignKeyField(Industry, backref='stocks', null=True)
+    shares_float = DecimalField(max_digits=12, decimal_places=0, null=True)
+    shares_outstanding = DecimalField(max_digits=12, decimal_places=0, null=True)
+    held_by_institutions = DecimalField(max_digits=6, decimal_places=5, null=True)
+    held_by_insiders = DecimalField(max_digits=6, decimal_places=5, null=True)
+
+
+class Etf(AssetBase, IdentifierMixin):
+    issuer = ForeignKeyField(EtfIssuer, backref='etfs', null=True)
+    category = ForeignKeyField(Category, backref='etfs', null=True)
+    market_index = ForeignKeyField(MarketIndex, backref='etfs', null=True)
+    leverage = IntegerField(choices=ETF_LEVERAGE_BY_CODE_CHOICES, default=ETF_LEVERAGE_NONE, null=True)
+    total_assets = DecimalField(max_digits=12, decimal_places=0, null=True)
+
+
+def create_tables():
+    with database:
+        database.create_tables([Exchange, MarketIndex, Category,
+                                EtfIssuer, Sector, Industry, Stock, Etf])

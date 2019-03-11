@@ -1,7 +1,15 @@
-from mongoengine import connect
+from peewee import PostgresqlDatabase
 
-from .settings import DATABASE_HOST
+DB_NAME = 'postgres'
+DB_USER = 'postgres'
+DB_PASS = 'postgres'
+DB_HOST = 'localhost'
+DB_PORT = 5432
 
 
-def init_db():
-    return connect(host=DATABASE_HOST)
+def get_db():
+    return PostgresqlDatabase(DB_NAME,
+                              user=DB_USER,
+                              password=DB_PASS,
+                              host=DB_HOST,
+                              port=DB_PORT)

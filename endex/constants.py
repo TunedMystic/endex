@@ -104,7 +104,7 @@ EXCHANGES_BY_NAME_CHOICES = tuple((name, name) for name in EXCHANGE_NAMES)
 # -------------------------------------------------------------------
 # -------------------------------------------------------------------
 
-ETF_LEVERAGE_NONE = 0
+ETF_LEVERAGE_NONE = 1
 
 # A flat mapping of Etf leverage code to Etf leverage display.
 ETF_LEVERAGE_BY_CODE = {
