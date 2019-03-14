@@ -6,6 +6,7 @@ from .constants import (COUNTRIES_BY_CODE_CHOICES,
                         ETF_LEVERAGE_BY_CODE_CHOICES,
                         ETF_LEVERAGE_NONE)
 from .db import get_db
+from .utils import make_asset_hash
 
 
 database = get_db()
@@ -21,6 +22,18 @@ class SimpleModel(BaseModel):
 
     def __str__(self):
         return self.name
+
+
+class IdentifierMixin(BaseModel):
+    cusip = CharField(max_length=9, null=True)
+    isin = CharField(max_length=12, null=True)
+
+
+class AddressMixin(BaseModel):
+    street = CharField(null=True)
+    city = CharField(null=True)
+    zipcode = CharField(null=True)
+    country = CharField(max_length=2, choices=COUNTRIES_BY_CODE_CHOICES, null=True)
 
 
 class Exchange(SimpleModel):
@@ -52,8 +65,7 @@ class AssetBase(SimpleModel):
     Base class for a financial Asset.
     """
 
-    # asset_hash = CharField(max_length=40)
-
+    asset_hash = CharField(max_length=40, null=True)
     symbol = CharField(max_length=10)
     exchange = ForeignKeyField(Exchange, null=True)
     description = TextField(null=True)
@@ -66,17 +78,26 @@ class AssetBase(SimpleModel):
     def __str__(self):
         return self.symbol
 
+    def _asset_hash_fields(self):
+        """
+        Return fields for asset hash calculation.
+        Returns:
+            list: a list of values that would be used
+                  to calculate the asset hash with.
+        """
+        return [self.symbol, str(self.exchange or '')]
 
-class IdentifierMixin(BaseModel):
-    cusip = CharField(max_length=9, null=True)
-    isin = CharField(max_length=12, null=True)
-
-
-class AddressMixin(BaseModel):
-    street = CharField(null=True)
-    city = CharField(null=True)
-    zipcode = CharField(null=True)
-    country = CharField(max_length=2, choices=COUNTRIES_BY_CODE_CHOICES, null=True)
+    def save(self, *args, **kwargs):
+        """
+        Create asset hash for a new object. Update asset hash if specified.
+        Args:
+            update_asset_hash (bool): Whether or not to recalculate the
+                                      asset hash.
+        """
+        update_asset_hash = kwargs.pop('update_asset_hash', False)
+        if not self.id or update_asset_hash:
+            self.asset_hash = make_asset_hash(*self._asset_hash_fields())
+        super().save(*args, **kwargs)
 
 
 class Stock(AssetBase, IdentifierMixin, AddressMixin):
