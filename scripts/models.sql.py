@@ -18,3 +18,6 @@
 ('CREATE TABLE IF NOT EXISTS "etfissuer" ("id" SERIAL NOT NULL PRIMARY KEY, "name" VARCHAR(255) NOT NULL)', [])
 ('CREATE TABLE IF NOT EXISTS "sector" ("id" SERIAL NOT NULL PRIMARY KEY, "name" VARCHAR(255) NOT NULL)', [])
 ('CREATE TABLE IF NOT EXISTS "industry" ("id" SERIAL NOT NULL PRIMARY KEY, "name" VARCHAR(255) NOT NULL)', [])
+
+
+# -------------------------------------------------------------------

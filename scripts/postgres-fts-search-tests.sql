@@ -147,17 +147,18 @@ LIMIT 10;
 -- Create new column 'document' on Stock.
 
 ALTER TABLE stock
-ADD COLUMN document tsvector;
+    ADD COLUMN document tsvector;
 
 -- Update new 'document' column with tsvector values.
 
-UPDATE stock s
-SET document = to_tsvector(s.symbol || ' ' || s.name);
+UPDATE
+    stock s
+SET
+    document = to_tsvector(s.symbol || ' ' || s.name);
 
 -- Create GIN (Generalized Inverted Index)-based index on 'document' column.
 
-CREATE INDEX stock_document_idx
-ON stock
+CREATE INDEX stock_document_idx ON stock
 USING GIN(document);
 
 -- ------------------------------------
