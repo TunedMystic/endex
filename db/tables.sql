@@ -1,7 +1,3 @@
--- Create schema.
-CREATE SCHEMA IF NOT EXISTS "endex";
-ALTER SCHEMA "endex" OWNER TO "endex";
-
 -- Create tables.
 CREATE TABLE IF NOT EXISTS "exchange" (
     "id" SERIAL NOT NULL PRIMARY KEY,
@@ -73,7 +69,7 @@ CREATE TABLE IF NOT EXISTS "stock" (
 );
 
 -- Create GIN index on Stock.document column.
-CREATE INDEX "stock_document_idx" ON "stock" USING GIN(document);
+CREATE INDEX IF NOT EXISTS "stock_document_idx" ON "stock" USING GIN(document);
 
 CREATE TABLE IF NOT EXISTS "etf" (
     "id" SERIAL NOT NULL PRIMARY KEY,
@@ -107,4 +103,4 @@ CREATE TABLE IF NOT EXISTS "etf" (
 );
 
 -- Create GIN index on Etf.document column.
-CREATE INDEX "etf_document_idx" ON "etf" USING GIN(document);
+CREATE INDEX IF NOT EXISTS "etf_document_idx" ON "etf" USING GIN(document);
