@@ -1,15 +1,13 @@
-from peewee import PostgresqlDatabase
-
-DB_NAME = 'postgres'
-DB_USER = 'postgres'
-DB_PASS = 'postgres'
-DB_HOST = 'localhost'
-DB_PORT = 5432
-
-
-def get_db():
-    return PostgresqlDatabase(DB_NAME,
-                              user=DB_USER,
-                              password=DB_PASS,
-                              host=DB_HOST,
-                              port=DB_PORT)
+def get_ids(conn, tablename):
+    """
+    Return a list of ids from the table.
+    Args:
+        conn (psycopg2.connection): A connection to the database.
+        tablename (str): The table to query.
+    Returns:
+        list[int]: The list of ids.
+    """
+    with conn:
+        with conn.cursor() as cursor:
+            cursor.execute(f'SELECT id FROM {tablename}')
+            return [r[0] for r in cursor.fetchall()]

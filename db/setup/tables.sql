@@ -1,12 +1,23 @@
+-- Drop tables.
+DROP TABLE IF EXISTS "exchange" CASCADE;
+DROP TABLE IF EXISTS "marketindex" CASCADE;
+DROP TABLE IF EXISTS "etfissuer" CASCADE;
+DROP TABLE IF EXISTS "category" CASCADE;
+DROP TABLE IF EXISTS "sector" CASCADE;
+DROP TABLE IF EXISTS "industry" CASCADE;
+DROP TABLE IF EXISTS "stock";
+DROP TABLE IF EXISTS "etf";
+
 -- Create tables.
 CREATE TABLE IF NOT EXISTS "exchange" (
     "id" SERIAL NOT NULL PRIMARY KEY,
-    "name" VARCHAR(255) NOT NULL,
-    "symbol" VARCHAR(10) NOT NULL
+    "symbol" VARCHAR(10) NOT NULL,
+    "name" VARCHAR(255) NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS "marketindex" (
     "id" SERIAL NOT NULL PRIMARY KEY,
+    "symbol" VARCHAR(10) NOT NULL,
     "name" VARCHAR(255) NOT NULL
 );
 
@@ -94,7 +105,7 @@ CREATE TABLE IF NOT EXISTS "etf" (
 
     -- Foreign key relations.
     "exchange_id" INTEGER REFERENCES "exchange" ("id"),
-    "category" INTEGER REFERENCES "category" ("id"),
+    "category_id" INTEGER REFERENCES "category" ("id"),
     "issuer_id" INTEGER REFERENCES "etfissuer" ("id"),
     "marketindex_id" INTEGER REFERENCES "marketindex" ("id"),
 
