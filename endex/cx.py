@@ -4,7 +4,7 @@ import logging
 import psycopg2
 from psycopg2 import pool
 
-from .settings import DB_CONFIG
+from endex import settings
 
 
 logger = logging.getLogger(__name__)
@@ -15,13 +15,13 @@ connection_pool = None
 def init(config=None):
     global connection_pool
     if not config:
-        config = DB_CONFIG
+        config = settings.DB_CONFIG
     connection_pool = pool.SimpleConnectionPool(1, 10, **config)
 
 
 def get(config=None):
     if not config:
-        config = DB_CONFIG
+        config = settings.DB_CONFIG
     return psycopg2.connect(**config)
 
 

@@ -1,7 +1,6 @@
 from endex import cx
-from endex.tests.factories import etf_factory, stock_factory
-
-from . import sqlutils
+from endex.utils import sqlutils
+from endex.utils.factories import etf_factory, stock_factory
 
 
 def setup():

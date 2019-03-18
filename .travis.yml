@@ -1,10 +1,33 @@
 language: python
+
 python:
   - "3.7-dev"
+
+services: postgresql
+addons:
+  postgresql: "9.6"
+
+env:
+  global:
+    - POSTGRES_DB=travisci
+    - POSTGRES_USER=postgres
+    - POSTGRES_PASSWORD=
+    - POSTGRES_HOST=localhost
+    - POSTGRES_PORT=5432
+    - POSTGRES_DB_TEST=testdb
+    - SQL_FIXTURES_DIR=$TRAVIS_BUILD_DIR/sql/fixtures
+    - SQL_SETUP_DIR=$TRAVIS_BUILD_DIR/sql/setup
+
 cache: pip
+
 install:
   - pip install -r requirements-dev.txt
+
+before_script:
+  - psql -c "CREATE DATABASE testdb;" -U postgres
+
 script:
-  - pytest --cov-report term --cov=./endex endex/tests
+  - pytest -rxs -vv --cov-report term --cov=./endex tests/
+
 after_success:
   - codecov

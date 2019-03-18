@@ -5,11 +5,7 @@ import random
 import faker
 from psycopg2.extras import execute_values
 
-from endex.constants import (
-    COUNTRIES_BY_CODE_CHOICES,
-    ETF_LEVERAGE_BY_CODE_CHOICES,
-)
-from endex import db
+from endex import constants, db
 
 
 ALPHABET = 'ABCDEFGHOJKLMNOPQRSTUVWXYZ'
@@ -22,11 +18,13 @@ def random_symbol():
 
 
 def random_country_code():
-    return COUNTRIES_BY_CODE_CHOICES[random.randint(0, len(COUNTRIES_BY_CODE_CHOICES) - 1)][0]
+    return constants.COUNTRIES_BY_CODE_CHOICES[
+        random.randint(0, len(constants.COUNTRIES_BY_CODE_CHOICES) - 1)
+    ][0]
 
 
 def random_leverage():
-    return random.choice(ETF_LEVERAGE_BY_CODE_CHOICES)[0]
+    return random.choice(constants.ETF_LEVERAGE_BY_CODE_CHOICES)[0]
 
 
 def random_cusip():

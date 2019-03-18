@@ -1,3 +1,0 @@
-DROP DATABASE IF EXISTS "testdb";
-CREATE DATABASE "testdb";
-GRANT ALL PRIVILEGES ON DATABASE "testdb" to "endex";

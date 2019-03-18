@@ -1,6 +1,6 @@
 import falcon
 
-from . import cx
+from endex import cx
 
 
 class InfoResource:

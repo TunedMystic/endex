@@ -1,10 +1,7 @@
 import pytest
 
-from endex import cx
-from endex.settings import TEST_DB_CONFIG
-from endex.utils import sqlutils
-
-from .factories import etf_factory, stock_factory
+from endex import cx, settings
+from endex.utils import factories, sqlutils
 
 
 @pytest.fixture(scope='function')
@@ -15,7 +12,7 @@ def connection():
     Returns:
         psycopg2.connection: A connection to the test database.
     """
-    conn = cx.get(TEST_DB_CONFIG)
+    conn = cx.get(settings.TEST_DB_CONFIG)
     sqlutils.create_tables(conn)
     yield conn
     conn.close()
@@ -63,7 +60,7 @@ def stocks(connection, fixtures):
         connection: The 'connection' fixture.
         fixtures: The 'fixtures' fixture.
     """
-    stock_factory(connection, 10)
+    factories.stock_factory(connection, 10)
 
 
 @pytest.fixture
@@ -74,4 +71,4 @@ def etfs(connection, fixtures):
         connection: The 'connection' fixture.
         fixtures: The 'fixtures' fixture.
     """
-    etf_factory(connection, 10)
+    factories.etf_factory(connection, 10)

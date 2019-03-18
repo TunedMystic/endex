@@ -19,7 +19,6 @@ services:
       - BETTER_EXCEPTIONS=1
     volumes:
       - .:/app
-    # command: tail -f /dev/null
 
 
   pg:
@@ -29,9 +28,7 @@ services:
       - endex
     ports:
       - "5432:5432"
-    env_file: ./env/prod.env
-    # volumes:
-    #   - pgdata:/var/lib/postgresql/data
+    env_file: ./env/dev.env
 
 
 # --------------------------------------------
@@ -39,10 +36,3 @@ services:
 # --------------------------------------------
 networks:
   endex:
-
-
-# --------------------------------------------
-# Define volumes to use.
-# --------------------------------------------
-volumes:
-  pgdata:
