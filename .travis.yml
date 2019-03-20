@@ -28,6 +28,7 @@ before_script:
 
 script:
   - pytest -rxs -vv --cov-report term --cov=./endex tests/
+  - isort --project endex --project tests --section-default THIRDPARTY --recursive --check-only --diff endex tests
 
 after_success:
   - codecov
